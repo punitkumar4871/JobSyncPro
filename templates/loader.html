@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Resumes...</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+        body {
+            background-color: #111d3a;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .loader-container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .loader-container h1 {
+            font-size: 2rem;
+            margin-bottom: 40px; 
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .progress-window {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            perspective: 500px;
+        }
+        .progress-list {
+            list-style: none;
+            padding: 0;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform-style: preserve-3d;
+        }
+        .progress-item {
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            padding: 10px;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .progress-item .icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #a0a0a0;
+            margin-right: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s ease-in-out;
+            flex-shrink: 0;
+        }
+        .progress-item.active .icon {
+            border-color: #2d9255;
+            background-color: #27874e;
+        }
+        .progress-item.active .icon .checkmark {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            animation: drawCheck 0.4s 0.3s ease-out forwards;
+        }
+        .checkmark {
+            stroke: white;
+            stroke-width: 4;
+            fill: none;
+        }
+        @keyframes drawCheck {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 6px solid #a0a0a0;
+            border-top-color: #27874e;
+            animation: spin 1s linear infinite;
+            margin: 50px auto 0;
+            display: none;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loader-container">
+    <h1>Analyzing<span id="ellipsis">.</span> Please Wait</h1>
+    
+    <div class="progress-window">
+        <ul class="progress-list">
+            <li class="progress-item">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="checkmark" d="M20 6L9 17l-5-5"/></svg></div>
+                <span>Validating and Preparing Files...</span>
+            </li>
+            <li class="progress-item">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="checkmark" d="M20 6L9 17l-5-5"/></svg></div>
+                <span>Extracting and Parsing Resumes...</span>
+            </li>
+            <li class="progress-item">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="checkmark" d="M20 6L9 17l-5-5"/></svg></div>
+                <span>Calling AI for In-depth Analysis...</span>
+            </li>
+            <li class="progress-item">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="checkmark" d="M20 6L9 17l-5-5"/></svg></div>
+                <span>Calculating Final Scores...</span>
+            </li>
+             <li class="progress-item">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="checkmark" d="M20 6L9 17l-5-5"/></svg></div>
+                <span>Generating Results Page...</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="loader" id="final-spinner"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const progressWindow = document.querySelector('.progress-window');
+        const progressList = document.querySelector('.progress-list');
+        const steps = document.querySelectorAll('.progress-item');
+        const spinner = document.getElementById('final-spinner');
+        const ellipsis = document.getElementById('ellipsis');
+        const stepCount = steps.length;
+
+        if (steps.length === 0) return;
+
+        const itemHeight = steps[0].offsetHeight;
+        const windowHeight = progressWindow.offsetHeight;
+        
+        const staggerTime = 1800;
+        const initialDelay = 500;
+
+        let dotCount = 1;
+        const ellipsisInterval = setInterval(() => {
+            ellipsis.textContent = '.'.repeat(dotCount);
+            dotCount = (dotCount % 3) + 1;
+        }, 600);
+
+        function updateView(activeIndex) {
+            const scrollOffset = (windowHeight / 2) - (itemHeight / 2) - (activeIndex * itemHeight);
+            progressList.style.transform = `translateY(${scrollOffset}px)`;
+
+            steps.forEach((step, i) => {
+                const distance = i - activeIndex;
+                let opacity = 0;
+                let rotation = 0;
+
+                if (distance === 0) {
+                    opacity = 1;
+                    rotation = 0;
+                } else if (Math.abs(distance) === 1) {
+                    opacity = 0.6;
+                    rotation = 20 * Math.sign(distance);
+                } else {
+                    opacity = 0.2;
+                    rotation = 30 * Math.sign(distance);
+                }
+                
+                step.style.opacity = opacity;
+                step.style.transform = `rotateX(${rotation}deg)`;
+            });
+        }
+
+        updateView(-1);
+
+        steps.forEach((step, index) => {
+            setTimeout(() => {
+                step.classList.add('active');
+                updateView(index);
+            }, initialDelay + (index * staggerTime));
+        });
+
+        const showSpinnerTime = initialDelay + (stepCount * staggerTime);
+        setTimeout(() => {
+            spinner.style.display = 'block';
+        }, showSpinnerTime);
+
+        const redirectTime = showSpinnerTime + 2000;
+        setTimeout(() => {
+            clearInterval(ellipsisInterval);
+            window.location.href = "{{ url_for('results') }}";
+        }, redirectTime);
+    });
+</script>
+
+</body>
+</html>

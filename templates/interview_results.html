@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Results - JobSyncPro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static',filename='interview.css')}}">
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">JobSyncPro</div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home_page') }}">Home</a></li>
+                <li><a href="https://github.com/yashvisharma1204/JobSyncPro">Documentation</a></li>
+                <li><a href="{{ url_for('home_page') }}#features">Features</a></li>
+            </ul>
+             <a href="{{ url_for('login_page') }}" class="btn btn-primary">Back →</a>
+        </div>
+    </nav>
+
+    <section class="results-section">
+        <div class="container">
+            <div class="results-header">
+                <h1>Interview Results</h1>
+                <h2>Overall Score: {{ results.overall_score }}/10</h2>
+                <p>{{ results.overall_feedback }}</p>
+            </div>
+
+            {% for eval in results.answer_evaluations %}
+            <div class="evaluation-card">
+                <h3>Question {{ loop.index }}: Score {{ eval.score }}/10</h3>
+                
+                <p class="label">Question:</p>
+                <p class="question-text">{{ eval.question }}</p>
+                
+                <p class="label">Your Answer:</p>
+                <div class="user-answer">"{{ eval.answer }}"</div>
+                
+                <p class="label">Feedback:</p>
+                <p class="feedback">{{ eval.feedback }}</p>
+            </div>
+            {% endfor %}
+
+            <div class="new-analysis-btn-container">
+                <a href="{{ url_for('home_page') }}" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">Start New Analysis</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 JobSyncPro. All rights reserved. AI-Powered Hiring Solutions.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
